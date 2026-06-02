@@ -34,37 +34,9 @@ class ObservationOperator:
         return y.squeeze(0) if single else y
 
 
-# ============================================================================
-# QUESTION 4.1 -- Likelihood score
-# ============================================================================
-# Student version (currently commented out -- the working implementation
-# follows below).
-#
-# For a Gaussian observation model ``y = H x + nu`` with ``nu ~ N(0, R)`` and
-# ``R = sigma_obs**2 * I``, the log-likelihood is
-#     log p(y | x) = -1/(2 sigma_obs**2) || y - H x ||**2 + const,
-# so
-#     grad_x log p(y | x) = H^T R^{-1} (y - H x) = H^T (y - H x) / sigma_obs**2.
-# Shapes:  x : (B, d), y : (m,), H : (m, d)  ->  (B, d).
-# ----------------------------------------------------------------------------
-# def likelihood_score(x, y, H, sigma_obs):
-#     """Gaussian likelihood score H^T R^{-1} (y - H x). (Student version.)"""
-#     # ---------------------------------------------------------------- #
-#     # >>> QUESTION 4.1: implement the Gaussian likelihood score.       #
-#     #                                                                  #
-#     #     residual = y - x @ H.T                # shape (B, m)         #
-#     #     return residual @ H / sigma_obs**2    # shape (B, d)         #
-#     # ---------------------------------------------------------------- #
-#     raise NotImplementedError("Q4.1: implement the likelihood score.")
-# ============================================================================
-
-
 def likelihood_score(x, y, H, sigma_obs):
-    """Clean-data Gaussian likelihood score ``H^T R^{-1} (y - H x)`` with
+    """ Gaussian likelihood score ``H^T R^{-1} (y - H x)`` with
     isotropic ``R = sigma_obs**2 I``.
-
-    Used by the Section-4 (single-observation) inverse problem, which does not
-    have a Gaussian background term. ``x : (B, d), y : (m,), H : (m, d) -> (B, d)``.
     """
     residual = y - x @ H.T                       # (B, m)
     return residual @ H / (sigma_obs ** 2)        # (B, d)
@@ -98,46 +70,6 @@ def var3d_analysis(x_b, B_inv, HtRinvH, HtRinvY):
     P_a_inv = B_inv + HtRinvH
     rhs = B_inv @ x_b + HtRinvY
     return torch.linalg.solve(P_a_inv, rhs), P_a_inv
-
-
-# ============================================================================
-# QUESTION 4.2 -- Posterior score (Bayes decomposition)
-# ============================================================================
-# Student version (currently commented out -- the working implementation
-# follows below).
-#
-# Complete the "likelihood-only" branch (the ``else`` block where ``y, H,
-# sigma_obs`` are passed). The posterior score is just the SUM
-#     s_post(x, t) = s_theta(x, t) + grad_x log p(y | x).
-# That is one line: take the prior score already computed
-# (``score = model(x, t_batch)``) and add the likelihood score from Q4.1.
-#
-# Do NOT touch the 3D-Var branch (the ``if B_inv is not None:`` block); it is
-# shipped complete as a more advanced background-aware variant used by the
-# cyclic data-assimilation experiment.
-# ----------------------------------------------------------------------------
-# def compute_posterior_score(model, x, t, *,
-#                             y=None, H=None, sigma_obs=None,
-#                             x_b=None, B_inv=None, HtRinvH=None, HtRinvY=None,
-#                             weight_bg=1.0, weight_obs=1.0):
-#     """Posterior score = prior score s_theta(x, t) + Gaussian guidance. (Student.)"""
-#     t_batch = t.expand(x.shape[0])
-#     score = model(x, t_batch)              # prior score s_theta(x, t)
-#
-#     if B_inv is not None:
-#         # ---- 3D-Var Gaussian guidance (provided complete, do NOT modify) -- #
-#         score = score + weight_bg * (x_b - x) @ B_inv
-#         score = score + weight_obs * (HtRinvY - x @ HtRinvH)
-#         return score
-#
-#     # ---------------------------------------------------------------- #
-#     # >>> QUESTION 4.2: implement the posterior score (likelihood mode).#
-#     #                                                                  #
-#     #     score = score + likelihood_score(x, y, H, sigma_obs)         #
-#     #     return score                                                  #
-#     # ---------------------------------------------------------------- #
-#     raise NotImplementedError("Q4.2: combine prior and likelihood scores.")
-# ============================================================================
 
 
 def compute_posterior_score(model, x, t, *,

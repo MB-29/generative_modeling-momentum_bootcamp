@@ -4,7 +4,7 @@ from tqdm import tqdm
 
 
 def langevin_sample(grad_f, x0, eta, n_steps):
-    """Run ULA chains and return their final states.
+    """Run Langevin Monte Carlo and return final states.
 
     Parameters
     ----------
@@ -35,13 +35,6 @@ def langevin_sample(grad_f, x0, eta, n_steps):
 
 
 def langevin_trajectory(grad_f, x0, eta, n_steps):
-    """Like :func:`langevin_sample` but also keeps every intermediate state.
-
-    Returns the full trajectory of shape ``(n_steps + 1,) + x.shape`` (so
-    ``(n_steps + 1, n_chains)`` in 1D, ``(n_steps + 1, n_chains, d)`` in d
-    dimensions). Used by the animation scripts; the notebook itself only needs
-    the final states from :func:`langevin_sample`.
-    """
     x = np.atleast_1d(np.asarray(x0, dtype=float)).copy()
     noise_scale = np.sqrt(2.0 * eta)
 
