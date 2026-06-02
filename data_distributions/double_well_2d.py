@@ -11,8 +11,8 @@ def f1(x):
 
 
 def df1(x):
-    """Derivative f1'(x) = 4 x^3 - 4 x + 0.3."""
-    return 4.0 * x**3 - 4.0 * x + 0.3
+    """Derivative f1'(x) of the double-well component."""
+    raise NotImplementedError("Question 1: implement f1'(x).")
 
 
 def f2(x):
@@ -21,8 +21,8 @@ def f2(x):
 
 
 def df2(x):
-    """Derivative f2'(x) = k x."""
-    return k * x
+    """Derivative f2'(x) of the harmonic component."""
+    raise NotImplementedError("Question 1: implement f2'(x).")
 
 
 def potential(x):

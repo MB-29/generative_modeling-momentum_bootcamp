@@ -56,16 +56,8 @@ def generate_samples(model, n_samples, dim, n_steps=1000, t_eps=1e-3,
     x = torch.randn(n_samples, dim, device=device)  # start from noise at t = 0
 
     for i in tqdm(range(n_steps)):
-        t = times[i]
-        t_batch = t.expand(n_samples)
-        beta_t = beta_schedule(t)
-
-        score = model(x, t_batch)
-        eta = 0.5 * beta_t * dt
-        x = (1.0 + eta) * x + 2.0 * eta * score
-
-        if i < n_steps - 1:  # no noise on the last step
-            x = x + torch.sqrt(2.0 * eta) * torch.randn_like(x)
+        raise NotImplementedError(
+            "Question 5: one generative step: drift along the time-conditional score and add noise")
 
     return x
 

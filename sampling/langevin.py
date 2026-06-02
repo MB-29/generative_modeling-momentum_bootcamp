@@ -25,11 +25,10 @@ def langevin_sample(grad_f, x0, eta, n_steps):
         Final states, same shape as ``x0``.
     """
     x = np.atleast_1d(np.asarray(x0, dtype=float)).copy()
-    noise_scale = np.sqrt(2.0 * eta)
 
     for index in tqdm(range(n_steps)):
-        noise = np.random.randn(*x.shape)
-        x = x - eta * grad_f(x) + noise_scale * noise
+        raise NotImplementedError(
+            "Question 2: draw Gaussian noise and apply the Langevin update.")
 
     return x
 

@@ -38,8 +38,9 @@ def likelihood_score(x, y, H, sigma_obs):
     """ Gaussian likelihood score ``H^T R^{-1} (y - H x)`` with
     isotropic ``R = sigma_obs**2 I``.
     """
-    residual = y - x @ H.T                       # (B, m)
-    return residual @ H / (sigma_obs ** 2)        # (B, d)
+    raise NotImplementedError(
+        "Question 6: precision-weighted observation residual, pulled back "
+        "through H.")
 
 
 def var3d_components(x_b, y, H, R, B):

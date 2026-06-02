@@ -55,13 +55,8 @@ def two_hists_vs_density(data, gen, grid, p_vals,
 def overlay_histograms(a, b, bins=80):
     """Overlay two empirical 1D histograms on a shared binning.
     """
-    a, b = np.asarray(a), np.asarray(b)
-    lo, hi = min(a.min(), b.min()), max(a.max(), b.max())
-    edges = np.linspace(lo, hi, bins + 1)
-    plt.hist(a, bins=edges, density=True, alpha=0.5)
-    plt.hist(b, bins=edges, density=True, alpha=0.5)
-    plt.ylabel("density")
-    plt.show()
+    raise NotImplementedError(
+        "Question 3: histogram `a` and `b` on a shared binning and show them.")
 
 
 def samples_2d(samples, title="data distribution (empirical)", bins=120,

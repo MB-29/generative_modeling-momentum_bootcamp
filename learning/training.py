@@ -26,13 +26,9 @@ def score_loss(model, x0):
     mu = mu_schedule(t).unsqueeze(-1)        # (B, 1)
     sigma = sigma_schedule(t).unsqueeze(-1)  # (B, 1)
 
-    eps = torch.randn_like(x0)
-    x_t = mu * x0 + sigma * eps
-
-    score = model(x_t, t)  # (B, dim)
-
-    residual = sigma * score + eps
-    return (residual**2).sum(dim=-1).mean()
+    raise NotImplementedError(
+        "Question 4: rescale and add noise to the signal, query the score, "
+        "and compare it to the noise.")
 
 
 def train_score_model(model, data, n_epochs=2000, batch_size=512, lr=1e-3):
