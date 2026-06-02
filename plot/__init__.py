@@ -35,8 +35,6 @@ from .diffusion import (
     overlay_histograms,
     samples_2d,
     noised_samples_across_sigma,
-    ring_density_and_marginal,
-    density_and_samples_2d,
     score_fields,
     field_across_noise,
     samples_comparison_2d,

@@ -20,13 +20,12 @@ def denoiser_panels_3d(clean, noisy, denoised):
     noisy = np.asarray(noisy)
     denoised = np.asarray(denoised)
 
-    # Shared box around the union of the three clouds (with a small margin).
     pooled = np.concatenate([clean, noisy, denoised], axis=0)
     lo, hi = pooled.min(0), pooled.max(0)
     pad = 0.05 * (hi - lo)
     lo, hi = lo - pad, hi + pad
 
-    fig = plt.figure(figsize=(9, 4))
+    fig = plt.figure(figsize=(12, 5))
     panels = [(clean, "data", "black"),
               (noisy, "noisy", "blue"),
               (denoised, "denoised", "red")]
