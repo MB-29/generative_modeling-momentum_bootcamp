@@ -1,21 +1,3 @@
-"""Section 1 — Langevin dynamics on the double-well potential.
-
-Public helpers
---------------
-* :func:`potential_and_density`    — side-by-side 1D U(x) + p(x).
-* :func:`potential_and_density_2d` — side-by-side 2D U(x, y) + p(x, y).
-* :func:`hist_vs_density`          — 1D histogram overlaid on an analytic curve.
-
-Shared with the animation scripts (``scripts/langevin_1d_*_anim.py``)
---------------------------------------------------------------------
-* :func:`density_grid_2d` evaluates a 2D density on a regular meshgrid.
-* :func:`build_density_marginal_figure` sets up the stacked 2-panel layout
-  (filled density contour on top, 1D x-marginal curve on bottom) and draws
-  the *static* layers. The caller adds their own scatter / particle dot /
-  trail / histogram on top. Both animation scripts and the notebook use it.
-* :func:`density_marginal_snapshot` is the one-shot wrapper for the notebook:
-  builds the layout *and* draws the ensemble scatter + accumulated histogram.
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -26,14 +8,14 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 # 1D — the original double well plots
 # --------------------------------------------------------------------------- #
 def potential_and_density(grid, potential_values, density_values):
-    """Side-by-side 1D potential U(x) and its Gibbs density p(x)."""
+    """Side-by-side 1D potential f(x) and its Gibbs density p(x)."""
     fig, (ax_potential, ax_density) = plt.subplots(1, 2, figsize=(11, 4))
     ax_potential.plot(grid, potential_values, color="darkred")
-    ax_potential.set(title=r"Potential $U(x)$",
-                     xlabel=r"$x$", ylabel=r"$U(x)$")
+    ax_potential.set(title=r"Potential $f(x)$",
+                     xlabel=r"$x$", ylabel=r"$f(x)$")
     ax_potential.axhline(0, color="gray", lw=0.5)
     ax_density.plot(grid, density_values, color="navy")
-    ax_density.set(title=r"Gibbs density $p(x)\propto e^{-U(x)}$",
+    ax_density.set(title=r"Gibbs density $p(x)\propto e^{-f(x)}$",
                    xlabel=r"$x$", ylabel=r"$p(x)$")
     plt.tight_layout()
     plt.show()
@@ -55,19 +37,14 @@ def hist_vs_density(samples, grid, p_vals, sample_label="ULA samples",
 # 2D — potential / density alone
 # --------------------------------------------------------------------------- #
 def potential_and_density_2d(grid_x, grid_y, potential_grid, density_grid):
-    """Side-by-side 2D potential U(x, y) and target density p(x, y), no samples.
+    fig, (ax_f, ax_p) = plt.subplots(1, 2, figsize=(16, 7))
 
-    The opening view of Section 1: the asymmetric double well in x plus a
-    harmonic trap in y, and the Gibbs density it induces (two blobs along x).
-    """
-    fig, (ax_U, ax_p) = plt.subplots(1, 2, figsize=(16, 7))
-
-    cU = ax_U.contourf(grid_x, grid_y, potential_grid,
-                       levels=30, cmap="plasma")
-    ax_U.set(title=r"Potential $f(x)$",
+    cf = ax_f.contourf(grid_x, grid_y, potential_grid,
+                       levels=30, cmap="coolwarm")
+    ax_f.set(title=r"Potential $f(x)$",
              xlabel=r"$x_1$", ylabel=r"$x_2$")
-    ax_U.set_aspect("equal")
-    fig.colorbar(cU, ax=ax_U, shrink=0.8)
+    ax_f.set_aspect("equal")
+    fig.colorbar(cf, ax=ax_f, shrink=0.8)
 
     cp = ax_p.contourf(grid_x, grid_y, density_grid, levels=30, cmap="Blues")
     ax_p.set(title=r"Target density",
@@ -87,9 +64,9 @@ def density_grid_2d(density_fn, xlim, ylim, n=240, **density_kwargs):
     Parameters
     ----------
     density_fn : callable
-        Vectorized density, ``density_fn(xy, **density_kwargs)``, accepting an
+        Vectorized density, ``density_fn(x, **density_kwargs)``, accepting an
         array of shape ``(..., 2)`` and returning the matching ``(...)`` shape
-        (the convention of :mod:`dynamics.double_well_gaussian_2d`).
+        (the convention of :mod:`data_distributions.double_well_gaussian_2d`).
     xlim, ylim : 2-tuples of floats
         Plot extent.
     n : int
@@ -185,27 +162,10 @@ def build_density_marginal_figure(GX, GY, Z, grid_x, p_x, *, xlim, ylim,
 
 def density_marginal_snapshot(density_grid, grid_x, p_x, samples, *,
                               xlim, ylim, n_bins=70, scatter_max=2500,
-                              title_2d="2D target density + ULA samples",
-                              title_marginal=(r"Ensemble histogram of $x$"
-                                              r" vs. marginal $p_x(x)$"),
+                              title_2d="Generated samples and  target density ",
+                              title_marginal=(r"Histogram of $x_1$"
+                                              r" and target marginal density"),
                               seed=0):
-    """Static analogue of the animation: 2D scatter + histogram drawn once.
-
-    Used by the notebook so the Section-1 figure and the animation frames share
-    the same layout, colors, and code path.
-
-    Parameters
-    ----------
-    density_grid : (GX, GY, Z)
-        Output of :func:`density_grid_2d` (or any meshgrid + density).
-    grid_x, p_x : 1D arrays
-        The analytic x-marginal curve plotted on the bottom panel.
-    samples : (N, 2) array
-        The ensemble at the moment of the snapshot.
-    scatter_max : int
-        Cap on the number of dots drawn in the top panel. The full ensemble is
-        still used for the bottom histogram.
-    """
     GX, GY, Z = density_grid
     fig, ax2d, axm = build_density_marginal_figure(
         GX, GY, Z, grid_x, p_x, xlim=xlim, ylim=ylim,

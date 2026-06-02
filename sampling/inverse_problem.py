@@ -1,59 +1,12 @@
-"""Conditional sampling for a linear-Gaussian inverse problem.
-
-We observe only the z-component (last coordinate) of the Lorenz state through
-
-    y = H x + nu,     H = [0, 0, 1],     nu ~ N(0, sigma_obs**2).
-
-Bayes' rule gives the posterior  p(x | y) propto p(x) p(y | x), so its score
-decomposes as a sum
-
-    grad_x log p(x | y) = grad_x log p(x)  +  grad_x log p(y | x).
-
-The prior score is exactly the trained diffusion model s_theta(x, t). For the
-likelihood we add a closed-form Gaussian score (no DPS / no Tweedie denoising of
-x_t, no back-prop through the network -- we literally add the two scores).
-
-We use the generative-time convention of ``sde.py`` (t=1 is the data, t=0 is
-noise), so the conditional sampler runs forward in t exactly like the
-unconditional one, only with the posterior score.
-
-Two guidance modes are supported:
-
-(1) **Likelihood only** -- pass ``y`` and ``observation`` (the original Section-4
-    inverse problem). The posterior score is
-
-        s_post(x_t, t) = s_theta(x_t, t) + grad log N(y; H x, sigma_obs**2 I).
-
-(2) **3D-Var-style Gaussian guidance** -- pass ``y``, ``observation``, a single
-    background mean ``x_b``, and the prior covariance ``B``. The Gaussian piece
-    is then the *exact* 3D-Var posterior
-
-        N(x_a, P_a),   P_a^{-1} = B^{-1} + H^T R^{-1} H,
-                       x_a     = x_b + K (y - H x_b),
-                       K       = B H^T (H B H^T + R)^{-1},
-
-    whose score is ``P_a^{-1} (x_a - x)``. The posterior score becomes
-
-        s_post(x_t, t) = s_theta(x_t, t) + P_a^{-1} (x_a - x_t).
-
-    With s_theta = 0 the sampler reproduces the 3D-Var posterior (mean and
-    covariance); with s_theta enabled the diffusion score adds an attractor
-    regularizer on top. This is the form used by the cyclic Lorenz DA experiment
-    in ``scripts/lorenz_cyclic_da.py`` -- it guarantees the diffusion sampler is
-    a strict improvement over 3D-Var on the Gaussian part.
-
-Everything operates in the standardized data space the score model was trained
-on -- standardize ``y``, ``sigma_obs`` (or ``R``), ``x_b`` and ``B`` accordingly.
-"""
 
 import numpy as np
 import torch
 
-from sampling.schedule import beta as vp_beta
+from sampling.schedule import beta_schedule
 
 
 def default_H(device=None):
-    """Observation matrix selecting the z-component (last coord), shape ``(1, 3)``."""
+    """Observation matrix selecting the third coordinate x_3, shape ``(1, 3)``."""
     return torch.tensor([[.0, .0, 1.0]], device=device)
 
 
@@ -120,17 +73,6 @@ def likelihood_score(x, y, H, sigma_obs):
 def var3d_components(x_b, y, H, R, B):
     """Pre-compute the 3D-Var guidance building blocks.
 
-    Returns ``(x_b, B_inv, HtRinvH, HtRinvY)`` as torch tensors matching
-    ``H``'s dtype/device. With weights ``w_bg = w_obs = 1`` the sum
-
-        w_bg * B^{-1} (x_b - x)  +  w_obs * (H^T R^{-1} y - H^T R^{-1} H x)
-       = P_a^{-1} (x_a - x)
-
-    is the exact 3D-Var posterior score, with ``P_a^{-1} = B^{-1} + H^T R^{-1} H``
-    and ``x_a = x_b + K(y - H x_b)``. Reducing either weight widens the implied
-    Gaussian (smaller precision) -- a stability knob for stiff R, and a way to
-    let the diffusion regularizer do relatively more work. Computed in float64
-    for conditioning.
     """
     H_np = H.detach().cpu().numpy().astype(np.float64)
     R_np = np.asarray(R, dtype=np.float64)
@@ -232,7 +174,7 @@ def conditional_sample(model, y, observation, n_samples, *,
                        background=None, B=None, R=None,
                        weight_bg=1.0, weight_obs=1.0,
                        dim=3, n_steps=1000, t_eps=1e-3,
-                       device=None, return_trajectory=False, seed=None):
+                       device=None, seed=None):
     """Sample from p(x | y) by integrating the generative VP-SDE forward in time
     with the posterior score.
 
@@ -297,11 +239,10 @@ def conditional_sample(model, y, observation, n_samples, *,
     dt = (1.0 - t_eps) / n_steps
 
     x = torch.randn(n_samples, dim, device=device)  # start from noise at t = 0
-    traj = [x.clone()] if return_trajectory else None
 
     for i in range(n_steps):
         t = times[i]
-        beta_t = vp_beta(t)
+        beta_t = beta_schedule(t)
 
         score = compute_posterior_score(
             model, x, t, y=y, H=H, sigma_obs=sigma_obs,
@@ -314,9 +255,4 @@ def conditional_sample(model, y, observation, n_samples, *,
         if i < n_steps - 1:
             x = x + torch.sqrt(beta_t * dt) * torch.randn_like(x)
 
-        if return_trajectory:
-            traj.append(x.clone())
-
-    if return_trajectory:
-        return x, torch.stack(traj, dim=0)
     return x

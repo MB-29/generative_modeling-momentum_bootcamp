@@ -1,16 +1,3 @@
-"""Score networks s_theta(x, t) for 1D and 3D data.
-
-A score network approximates the (Stein) score of the noised marginal,
-s_theta(x, t) ~= grad_x log p_t(x). Both networks share the same recipe:
-
-    1. concatenate the scalar diffusion time t directly onto the state x,
-    2. push it through a small MLP that outputs a vector of the same
-       dimension as x (the score).
-
-Because the data here is at most 3-dimensional, we skip the usual sinusoidal
-time embedding and simply feed t as one extra input coordinate. This keeps the
-network tiny and the learning task as simple as possible.
-"""
 
 import torch
 import torch.nn as nn

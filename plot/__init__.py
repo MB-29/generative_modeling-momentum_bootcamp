@@ -32,28 +32,23 @@ from .diffusion import (
     loss_curve,
     score_1d,
     two_hists_vs_density,
-    two_hists,
+    overlay_histograms,
     samples_2d,
+    noised_samples_across_sigma,
     ring_density_and_marginal,
     density_and_samples_2d,
     score_fields,
     field_across_noise,
     samples_comparison_2d,
+    denoiser_panels_2d,
     mode_weight_bars,
 )
-from .lorenz import comparison_3d
+from .lorenz import comparison_3d, denoiser_panels_3d
 from .inverse import posterior_ensemble
 from . import cyclic_da
 
 
 def use_latex(preamble=r"\usepackage{amsmath}\usepackage{amssymb}"):
-    """Render every matplotlib text/math string with a real LaTeX engine.
-
-    Call once near the top of a notebook or script (before drawing). Requires a
-    working LaTeX installation on the system path; without one matplotlib will
-    raise when it tries to render. The default ``preamble`` is enough for the
-    bootcamp's math (``\\mathbf``, ``\\nabla``, ``\\mathcal``, ``\\propto``, …).
-    """
     rc("text", usetex=True)
     rc("text.latex", preamble=preamble)
 
@@ -75,14 +70,17 @@ __all__ = [
     "two_hists_vs_density",
     "two_hists",
     "samples_2d",
+    "noised_samples_across_sigma",
     "ring_density_and_marginal",
     "density_and_samples_2d",
     "score_fields",
     "field_across_noise",
     "samples_comparison_2d",
+    "denoiser_panels_2d",
     "mode_weight_bars",
     # Section 3
     "comparison_3d",
+    "denoiser_panels_3d",
     # Section 4
     "posterior_ensemble",
     # Cyclic DA (namespaced; access as plot.cyclic_da.*)
