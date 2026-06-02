@@ -49,7 +49,7 @@ on -- standardize ``y``, ``sigma_obs`` (or ``R``), ``x_b`` and ``B`` accordingly
 import numpy as np
 import torch
 
-from sde import beta as vp_beta
+from sampling.schedule import beta as vp_beta
 
 
 def default_H(device=None):
@@ -222,7 +222,8 @@ def conditional_sample(model, y, observation, n_samples, *,
         bg_np = np.asarray(background, dtype=np.float64)
         x_b_np = bg_np.mean(axis=0) if bg_np.ndim == 2 else bg_np
         m = H.shape[0]
-        R_eff = (sigma_obs ** 2 * np.eye(m)) if R is None else np.asarray(R, dtype=np.float64)
+        R_eff = (sigma_obs ** 2 * np.eye(m)
+                 ) if R is None else np.asarray(R, dtype=np.float64)
         x_b, B_inv, HtRinvH, HtRinvY = var3d_components(
             x_b_np, y.detach().cpu().numpy(), H=H, R=R_eff, B=B,
         )

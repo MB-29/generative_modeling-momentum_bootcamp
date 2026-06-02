@@ -5,7 +5,7 @@ import torch
 import matplotlib.pyplot as plt
 from matplotlib import rc, colormaps
 
-from sde import sigma_t, time_from_sigma
+from sampling.schedule import sigma_t, time_from_sigma
 
 rc('font', size=20)
 
@@ -71,7 +71,20 @@ def two_hists(a, b, bins=80, labels=("data", "Langevin"),
 
     Used to *see* a sampler's failure mode: if the two histograms put different
     mass on the two peaks, the sampler is misweighting the modes.
+
+    Accepts either 1D arrays or 2D point clouds. For 2D inputs each cloud is
+    projected onto the first principal axis of the pooled data -- for a
+    well-separated bimodal distribution that is the mode-connecting direction,
+    so callers don't have to compute it themselves.
     """
+    a, b = np.asarray(a), np.asarray(b)
+    if a.ndim == 2:
+        pooled = np.concatenate([a, b], axis=0)
+        centered = pooled - pooled.mean(0)
+        # leading right-singular vector = first principal axis
+        _, _, vt = np.linalg.svd(centered, full_matrices=False)
+        axis = vt[0]
+        a, b = a @ axis, b @ axis
     lo, hi = min(a.min(), b.min()), max(a.max(), b.max())
     edges = np.linspace(lo, hi, bins + 1)
     plt.hist(a, bins=edges, density=True, alpha=0.5,

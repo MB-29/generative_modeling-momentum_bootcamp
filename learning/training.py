@@ -28,7 +28,7 @@ it is exactly the standard "predict the noise" parameterization. Set
 import torch
 from tqdm import tqdm
 
-from sde import mu_t as vp_mu, sigma_t as vp_sigma
+from sampling.schedule import mu_t as vp_mu, sigma_t as vp_sigma
 
 # Avoid sampling exactly t = 1 (the data end) where sigma_t = 0 and the score
 # target -eps/sigma_t is singular.

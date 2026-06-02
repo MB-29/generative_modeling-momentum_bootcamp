@@ -60,17 +60,17 @@ def potential_and_density_2d(grid_x, grid_y, potential_grid, density_grid):
     The opening view of Section 1: the asymmetric double well in x plus a
     harmonic trap in y, and the Gibbs density it induces (two blobs along x).
     """
-    fig, (ax_U, ax_p) = plt.subplots(1, 2, figsize=(11, 4.4))
+    fig, (ax_U, ax_p) = plt.subplots(1, 2, figsize=(16, 7))
 
     cU = ax_U.contourf(grid_x, grid_y, potential_grid,
-                       levels=30, cmap="inferno")
-    ax_U.set(title=r"Potential $U(x_1, x_2)$",
+                       levels=30, cmap="plasma")
+    ax_U.set(title=r"Potential $f(x)$",
              xlabel=r"$x_1$", ylabel=r"$x_2$")
     ax_U.set_aspect("equal")
     fig.colorbar(cU, ax=ax_U, shrink=0.8)
 
     cp = ax_p.contourf(grid_x, grid_y, density_grid, levels=30, cmap="Blues")
-    ax_p.set(title=r"Gibbs density $p(x_1, x_2)\propto e^{-U(x_1, x_2)}$",
+    ax_p.set(title=r"Target density",
              xlabel=r"$x_1$", ylabel=r"$x_2$")
     ax_p.set_aspect("equal")
     fig.colorbar(cp, ax=ax_p, shrink=0.8)

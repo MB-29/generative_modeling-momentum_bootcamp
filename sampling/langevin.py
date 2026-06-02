@@ -14,6 +14,7 @@ barrier.
 """
 
 import numpy as np
+from tqdm import tqdm
 
 
 def langevin_sample(grad_U, x0, eta, n_steps, tau=1.0, return_trajectory=False,
@@ -58,7 +59,7 @@ def langevin_sample(grad_U, x0, eta, n_steps, tau=1.0, return_trajectory=False,
     if return_trajectory:
         traj[0] = x
 
-    for k in range(n_steps):
+    for k in tqdm(range(n_steps)):
         eps = rng.standard_normal(size=x.shape)
         x = x - eta * grad_U(x) + noise_scale * eps
         if return_trajectory:

@@ -23,7 +23,7 @@ The sampler is dimension-agnostic: pass a ``ScoreNet1D`` with ``dim=1`` or a
 
 import torch
 
-from sde import beta as vp_beta
+from sampling.schedule import beta as vp_beta
 
 
 @torch.no_grad()

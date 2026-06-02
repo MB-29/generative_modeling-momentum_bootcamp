@@ -1,35 +1,3 @@
-"""A factorized 2D double well: the 1D well in x, a Gaussian trap in y.
-
-This lifts the asymmetric 1D double well into the plane the simplest way
-possible -- keep it along x and add an independent quadratic (harmonic) trap in
-y:
-
-    U(x, y) = u(x) + 1/2 * k * y**2,      u(x) = x**4 - 2 x**2 + 0.3 x.
-
-Because the potential is a *sum* of an x-part and a y-part, the Gibbs density
-factorizes,
-
-    p(x, y) = p_x(x) * p_y(y),
-
-with ``p_x`` the familiar bimodal 1D double-well density and ``p_y`` a centered
-Gaussian of variance ``tau / k``. So the 2D target is two blobs side by side
-along x -- the heavy left well near ``x = -1.05`` and the light right well near
-``x = +0.95`` -- each a Gaussian ridge in y.
-
-This is the cleanest 2D picture for *watching* Langevin dynamics: the score is a
-genuine 2D vector field you can draw as arrows, yet the bimodality we care about
-still lives entirely along one axis. Unlike the *radial* well in
-``double_well_2d.py`` (concentric rings), the two modes here are separated along
-x and split by a barrier at ``x = 0``, so a single chain's metastability -- the
-difficulty of hopping wells -- is plainly visible as the particles animate.
-
-All functions are vectorized over a leading batch axis: pass points of shape
-``(..., 2)`` and get back the matching shape. ``grad_potential`` returns
-``(..., 2)``, exactly the layout the (dimension-agnostic) Langevin sampler in
-``sampling/langevin.py`` expects, so we reuse it unchanged to draw samples. The
-``(xy, tau=...)`` signatures of :func:`gibbs_density` and :func:`score` mirror
-``double_well_2d`` so the same helpers in ``plot.py`` work without changes.
-"""
 
 import numpy as np
 from scipy.integrate import quad
