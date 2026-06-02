@@ -64,6 +64,53 @@ def _exp(x):
     return x.exp()  # torch tensor
 
 
+# ============================================================================
+# QUESTION 2.1 -- VP schedule (mu_t, sigma_t)
+# ============================================================================
+# Student version (currently commented out -- the working implementations
+# follow below).
+#
+# Complete the two functions ``mu_t`` and ``sigma_t`` using
+#     mu_t    = exp(-0.5 * B(1 - t))
+#     sigma_t = sqrt(1 - mu_t**2)
+# The helper ``_corruption_integral(s) = B(s)`` is already implemented above.
+# Use the ``_exp`` wrapper for the exponential so the same function works for
+# numpy arrays and torch tensors. For the square root in ``sigma_t``, clip the
+# argument to a small positive number (~1e-20) before taking the root (it can
+# be very slightly negative at t=1 because of floating-point round-off).
+#
+# Sanity check: ``mu_t(0.0)`` should be ~0 and ``mu_t(1.0) = 1``; ``sigma_t(1.0)``
+# should be ~0 and ``sigma_t(0.0)`` should be ~1.
+# ----------------------------------------------------------------------------
+# def mu_t(t, beta_min=BETA_MIN, beta_max=BETA_MAX):
+#     """Signal coefficient mu_t = exp(-0.5 * B(1 - t)): mu_1 = 1 (data), mu_0 ~ 0."""
+#     # ---------------------------------------------------------------- #
+#     # >>> QUESTION 2.1 (a): implement mu_t.                            #
+#     #                                                                  #
+#     #     Use ``_corruption_integral(1 - t, beta_min, beta_max)`` and  #
+#     #     the wrapper ``_exp(...)`` so it works with numpy AND torch.  #
+#     # ---------------------------------------------------------------- #
+#     raise NotImplementedError("Q2.1(a): implement mu_t.")
+#
+#
+# def sigma_t(t, beta_min=BETA_MIN, beta_max=BETA_MAX):
+#     """Noise level sigma_t = sqrt(1 - mu_t**2): sigma_1 = 0 (data), sigma_0 ~ 1."""
+#     # ---------------------------------------------------------------- #
+#     # >>> QUESTION 2.1 (b): implement sigma_t.                         #
+#     #                                                                  #
+#     #     Build ``var = 1 - mu_t(t, ...)**2``, then return its square  #
+#     #     root after clipping to a small positive number (eg 1e-20) to #
+#     #     avoid sqrt of a tiny negative round-off.                     #
+#     #                                                                  #
+#     #     For numpy:                                                    #
+#     #         return np.sqrt(np.clip(var, 1e-20, None))                #
+#     #     For torch:                                                    #
+#     #         return var.clamp_min(1e-20).sqrt()                       #
+#     # ---------------------------------------------------------------- #
+#     raise NotImplementedError("Q2.1(b): implement sigma_t.")
+# ============================================================================
+
+
 def mu_t(t, beta_min=BETA_MIN, beta_max=BETA_MAX):
     """Signal coefficient mu_t = exp(-0.5 * B(1 - t)): mu_1 = 1 (data), mu_0 ~ 0."""
     return _exp(-0.5 * _corruption_integral(1.0 - t, beta_min, beta_max))

@@ -35,6 +35,51 @@ from sampling.schedule import mu_t as vp_mu, sigma_t as vp_sigma
 T_EPS = 1e-3
 
 
+# ============================================================================
+# QUESTION 2.2 -- Denoising score matching loss
+# ============================================================================
+# Student version (currently commented out -- the working implementation
+# follows below).
+#
+# Complete the body of ``dsm_loss``. You should:
+#   1. Sample noise ``eps`` of the same shape as ``x0`` with ``torch.randn_like``.
+#   2. Build the noised sample ``x_t = mu * x0 + sigma * eps``
+#      (``mu``, ``sigma`` of shape ``(B, 1)`` already pre-computed).
+#   3. Evaluate the score network at ``(x_t, t)``.
+#   4. Return the squared-norm residual:
+#        - if ``weighted=True`` (default, stable):  sigma * score + eps
+#        - if ``weighted=False`` (literal DSM):      score + eps / sigma
+#      averaged over the batch (sum over feature dim, mean over batch).
+# ----------------------------------------------------------------------------
+# def dsm_loss(model, x0, weighted=True, t_eps=T_EPS):
+#     """Denoising score-matching loss on a batch of clean samples ``x0``. (Student.)"""
+#     B = x0.shape[0]
+#     device = x0.device
+#
+#     # t ~ U(0, 1 - t_eps): cover the whole schedule but stay off the data end
+#     # t = 1 where sigma_t = 0.
+#     t = torch.rand(B, device=device) * (1.0 - t_eps)
+#     mu = vp_mu(t).unsqueeze(-1)        # (B, 1)
+#     sigma = vp_sigma(t).unsqueeze(-1)  # (B, 1)
+#
+#     # ---------------------------------------------------------------- #
+#     # >>> QUESTION 2.2: implement the DSM loss.                        #
+#     #                                                                  #
+#     #     eps   = ...                  # Gaussian noise, shape as x0   #
+#     #     x_t   = ...                  # mu * x0 + sigma * eps         #
+#     #     score = ...                  # model(x_t, t)                 #
+#     #                                                                  #
+#     #     if weighted:                                                  #
+#     #         residual = sigma * score + eps                            #
+#     #     else:                                                         #
+#     #         residual = score + eps / sigma                            #
+#     #                                                                  #
+#     #     return (residual ** 2).sum(dim=-1).mean()                     #
+#     # ---------------------------------------------------------------- #
+#     raise NotImplementedError("Q2.2: implement the DSM loss.")
+# ============================================================================
+
+
 def dsm_loss(model, x0, weighted=True, t_eps=T_EPS):
     """Denoising score-matching loss on a batch of clean samples ``x0``.
 

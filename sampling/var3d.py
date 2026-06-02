@@ -54,7 +54,7 @@ size 1 here, and ``spread_*`` is identically zero -- 3D-Var is deterministic).
 
 import numpy as np
 
-from dynamics.lorenz import integrate_trajectories
+from data_distributions.lorenz import integrate_trajectories
 
 
 # --------------------------------------------------------------------------- #

@@ -17,6 +17,53 @@ import numpy as np
 from tqdm import tqdm
 
 
+# ============================================================================
+# QUESTION 1.1 -- Langevin update rule
+# ============================================================================
+# Student version (currently commented out -- the working implementation
+# follows below).
+#
+# Inside the for-loop, fill in the ULA iteration:
+#   1. Draw an i.i.d. Gaussian noise vector ``eps`` of the same shape as ``x``
+#      (use ``rng.standard_normal(size=x.shape)``).
+#   2. Update ``x`` with the discretized Langevin step
+#      ``x <- x - eta * grad_U(x) + sqrt(2 * eta * tau) * eps``.
+#      The scalar ``sqrt(2 * eta * tau)`` is already pre-computed as
+#      ``noise_scale``.
+# ----------------------------------------------------------------------------
+# def langevin_sample(grad_U, x0, eta, n_steps, tau=1.0, return_trajectory=False,
+#                     rng=None):
+#     """Run ULA chains. (Student version.)"""
+#     if rng is None:
+#         rng = np.random.default_rng()
+#
+#     x = np.atleast_1d(np.asarray(x0, dtype=float)).copy()
+#     noise_scale = np.sqrt(2.0 * eta * tau)
+#
+#     traj = np.empty((n_steps + 1,) + x.shape) if return_trajectory else None
+#     if return_trajectory:
+#         traj[0] = x
+#
+#     for k in tqdm(range(n_steps)):
+#         # ---------------------------------------------------------------- #
+#         # >>> QUESTION 1.1: implement the ULA step.                        #
+#         #                                                                  #
+#         #     eps = ...                # i.i.d. Gaussian, shape as x       #
+#         #     x   = ...                # ULA update                        #
+#         #                                                                  #
+#         # The scalar sqrt(2 * eta * tau) is available as `noise_scale`.    #
+#         # ---------------------------------------------------------------- #
+#         raise NotImplementedError("Q1.1: implement the Langevin update rule.")
+#
+#         if return_trajectory:
+#             traj[k + 1] = x
+#
+#     if return_trajectory:
+#         return x, traj
+#     return x
+# ============================================================================
+
+
 def langevin_sample(grad_U, x0, eta, n_steps, tau=1.0, return_trajectory=False,
                     rng=None):
     """Run ULA chains.

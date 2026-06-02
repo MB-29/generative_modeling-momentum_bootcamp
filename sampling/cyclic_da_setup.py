@@ -22,7 +22,7 @@ butterfly wing, and the diffusion prior is needed to capture that.
 
 import numpy as np
 
-from dynamics.lorenz import Lorenz63, integrate_trajectories
+from data_distributions.lorenz import Lorenz63, integrate_trajectories
 
 
 # Observation operator: select (x_2, x_3). x_1 stays hidden.

@@ -43,7 +43,7 @@ from scipy.special import logsumexp
 # the score field is anisotropic rather than purely radial.
 WEIGHTS = np.array([0.65, 0.35])
 MEANS = np.array([[-1.5, -1.0],
-                  [ 1.6,  1.2]])
+                  [1.6,  1.2]])
 COVS = np.array([[[0.55, 0.25],
                   [0.25, 0.35]],
                  [[0.50, -0.20],
@@ -115,7 +115,8 @@ def grad_log_pdf(xy):
     """
     diff = _diffs(xy)                                        # (..., K, 2)
     _, resp = _log_pdf_and_resp(xy)                          # (..., K)
-    inv_cov_diff = np.einsum("kij,...kj->...ki", _INV_COVS, diff)  # (..., K, 2)
+    inv_cov_diff = np.einsum(
+        "kij,...kj->...ki", _INV_COVS, diff)  # (..., K, 2)
     return -np.einsum("...k,...ki->...i", resp, inv_cov_diff)
 
 
